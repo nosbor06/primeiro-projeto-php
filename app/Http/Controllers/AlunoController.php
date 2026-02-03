@@ -58,38 +58,38 @@ class AlunoController extends Controller
     public function edit(string $id)
     {
        
-        $aluno = alunos::findOrFail($id);
+        $aluno = Aluno::findOrFail($id);
 
-        return view('users.edit', compact('user'));
+        return view('alunos.edit', compact('aluno'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Aluno $aluno)
-    {
-        $validated = $request->validate([
-            'nome' => ['required', 'string', 'max:255'],
-            'done' => ['nullable'],
-        ]);
+   public function update(Request $request, Aluno $aluno)
+{
+    $validated = $request->validate([
+        'nome'            => 'required|string|max:255',
+        'email'           => 'required|email|unique:alunos,email,' . $aluno->id,
+        'data_nascimento' => 'required|date',
+    ]);
 
-        $aluno->update([
-            'nome' => $validated['nome'],
-            'done' => $request->has('done'),
-        ]);
+    $aluno->update($validated);
 
-        return redirect()->route('tasks.index');
-    
-    }
+    return redirect()->route('alunos.index')
+        ->with('success', 'Aluno atualizado com sucesso!');
+}
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        
-        $aluno->delete();
-        return redirect()->route('alunos.index');
+        Aluno::findOrFail($id)->delete();
+
+        return redirect()->route('alunos.index')
+        ->with('success','Aluno removido.');
+       
         
     }
 }
